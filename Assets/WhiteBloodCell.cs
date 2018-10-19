@@ -63,37 +63,52 @@ public class WhiteBloodCell : MonoBehaviour {
     {
         CheckForNearbyPlayer();
 
-        if (currentPath != null)
+
+        if(target.GetComponent<PlayerTemp>())
         {
-            //Check to see if were close enough to a corner of the path to switch our target to the next corner
-            if ((GetGroundedPosition(transform.position) - currentPath.corners[currentPointInPath]).magnitude < cornerThreshold)
+            var direction = (target.transform.position - transform.position).normalized;
+            transform.position += direction * speed * Time.deltaTime;
+
+        }else
+        {
+            if (currentPath != null)
             {
-                currentPointInPath++;
-
-                //If there are no corners left to go to, nullify the currentPath so we stop moving.
-                if (currentPointInPath > currentPath.corners.Length - 1)
+                //Check to see if were close enough to a corner of the path to switch our target to the next corner
+                if ((GetGroundedPosition(transform.position) - currentPath.corners[currentPointInPath]).magnitude < cornerThreshold)
                 {
+                    currentPointInPath++;
 
-                    currentPath = null;
-                    currentPointInPath = -1;
-                    return;
+                    //If there are no corners left to go to, nullify the currentPath so we stop moving.
+                    if (currentPointInPath > currentPath.corners.Length - 1)
+                    {
+
+                        currentPath = null;
+                        currentPointInPath = -1;
+                        return;
+                    }
                 }
+
+
+                var direction = currentPath.corners[currentPointInPath] - transform.position;
+                //Ignore any Y calculation in the direction since we want to control our height through other methods
+                direction.y = 0;
+                direction.Normalize();
+                transform.position += direction * speed * Time.deltaTime;
             }
 
-
-            var direction = currentPath.corners[currentPointInPath] - transform.position;
-            //Ignore any Y calculation in the direction since we want to control our height through other methods
-            direction.y = 0;
-            direction.Normalize();
-            transform.position += direction * speed * Time.deltaTime;
         }
 
+
     }
+
+
 
     void CheckForNearbyPlayer()
     {
         Collider[] objects = Physics.OverlapSphere(transform.position, aggroRange);
 
+        if (target.GetComponent<PlayerTemp>())
+            return;
         //See if the player is in range of us
         foreach (Collider col in objects){
 
@@ -123,9 +138,4 @@ public class WhiteBloodCell : MonoBehaviour {
 	}
 
 
-    void OnCollisionEnter(Collision coll)
-    {
-
-
-    }
 }
