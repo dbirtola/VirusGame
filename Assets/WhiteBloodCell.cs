@@ -6,6 +6,8 @@ using UnityEngine.AI;
 public class WhiteBloodCell : MonoBehaviour {
 
     public GameObject target;
+
+    [Header("Movement")]
     public float speed = 1500f;
 
     NavMeshPath currentPath;
@@ -14,7 +16,11 @@ public class WhiteBloodCell : MonoBehaviour {
     //Defines how close the game object needs to be to a corner of the path before it sets the next corner as its target.
     public float cornerThreshold = 1;
 
-	void Start () {
+    [Header("Combat")]
+    public int aggroRange = 50;
+    public float aggroSpeedBoost = 1.5f;
+
+    void Start () {
 
 
         CalculateNewPath();
@@ -55,6 +61,8 @@ public class WhiteBloodCell : MonoBehaviour {
 
     void UpdatePosition()
     {
+        CheckForNearbyPlayer();
+
         if (currentPath != null)
         {
             //Check to see if were close enough to a corner of the path to switch our target to the next corner
@@ -82,8 +90,42 @@ public class WhiteBloodCell : MonoBehaviour {
 
     }
 
+    void CheckForNearbyPlayer()
+    {
+        Collider[] objects = Physics.OverlapSphere(transform.position, aggroRange);
+
+        //See if the player is in range of us
+        foreach (Collider col in objects){
+
+            if (col.gameObject.GetComponent<PlayerTemp>())
+            {
+
+                //Check if we canactually see the player
+                RaycastHit hit;
+                Vector3 direction = col.gameObject.transform.position - transform.position;
+                Physics.Raycast(transform.position, direction, out hit, aggroRange);
+
+                GameObject hitObject = hit.collider.gameObject;
+
+                if (hitObject.GetComponent<PlayerTemp>())
+                {
+                    target = hitObject;
+                    speed *= aggroSpeedBoost;
+                    CalculateNewPath();
+                }
+            }
+
+        } //end foreach
+    }
 
     void Update () {
         UpdatePosition();
 	}
+
+
+    void OnCollisionEnter(Collision coll)
+    {
+
+
+    }
 }
