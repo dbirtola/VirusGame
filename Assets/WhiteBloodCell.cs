@@ -6,6 +6,9 @@ using UnityEngine.AI;
 public class WhiteBloodCell : MonoBehaviour {
 
     public GameObject target;
+    Vector3 targetPosition;
+
+    float personalFloatFactor;
 
     [Header("Movement")]
     public float speed = 1500f;
@@ -22,8 +25,12 @@ public class WhiteBloodCell : MonoBehaviour {
 
     void Start () {
 
+        personalFloatFactor = Random.Range(-4, 4f);
 
+        GetRandomTargetPosition();
         CalculateNewPath();
+
+
       
 	}
 
@@ -37,13 +44,24 @@ public class WhiteBloodCell : MonoBehaviour {
         //Create the position the GameObject would be on if it were grounded for use in calculating the NavMesh path
         Vector3 groundedPosition = GetGroundedPosition(transform.position);
 
-        Vector3 targetGroundedPosition = GetGroundedPosition(target.transform.position);
+
+        Vector3 targetGroundedPosition;
+        if (target == null)
+        {
+            targetGroundedPosition = GetGroundedPosition(targetPosition);
+        }else
+        {
+            targetGroundedPosition = GetGroundedPosition(target.transform.position);
+        }
+
+
+
 
         bool pathExists = NavMesh.CalculatePath(groundedPosition, targetGroundedPosition, GetComponent<NavMeshAgent>().areaMask, newPath);
 
         if (!pathExists)
         {
-            Debug.LogWarning("No path found for: " + gameObject.name);
+            Debug.LogWarning("No path found for: " + gameObject.name + " to " + targetGroundedPosition);
         }else 
         {
             //Update member variables to use the new path calculated
@@ -58,13 +76,21 @@ public class WhiteBloodCell : MonoBehaviour {
         return new Vector3(position.x, 0, position.z);
     }
 
+    void UpdateY()
+    {
+        if(target == null)
+        {
+            float newY = transform.position.y + Mathf.Sin(Time.time) * personalFloatFactor * Time.deltaTime;
+            GetComponent<Rigidbody>().transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+        }
+    }
 
     void UpdatePosition()
     {
         CheckForNearbyPlayer();
 
 
-        if(target.GetComponent<PlayerTemp>())
+        if(target && target.GetComponent<PlayerTemp>())
         {
             var direction = (target.transform.position - transform.position).normalized;
             transform.position += direction * speed * Time.deltaTime;
@@ -84,6 +110,9 @@ public class WhiteBloodCell : MonoBehaviour {
 
                         currentPath = null;
                         currentPointInPath = -1;
+
+                        GetRandomTargetPosition();
+                        CalculateNewPath();
                         return;
                     }
                 }
@@ -98,17 +127,38 @@ public class WhiteBloodCell : MonoBehaviour {
 
         }
 
-
+        UpdateY();
     }
 
 
+    void GetRandomTargetPosition() {
+        Vector3 direction = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f));
 
+        float distance = Random.Range(0, 60);
+
+        RaycastHit hit;
+        Physics.Raycast(transform.position, direction.normalized, out hit, aggroRange);
+
+        if (hit.collider != null)
+        {
+
+            targetPosition = transform.position + direction * (hit.distance - 10f);
+        }
+        else
+        {
+            targetPosition = transform.position + direction * distance;
+        }
+
+    }
     void CheckForNearbyPlayer()
     {
         Collider[] objects = Physics.OverlapSphere(transform.position, aggroRange);
 
-        if (target.GetComponent<PlayerTemp>())
+
+        if (target && target.GetComponent<PlayerTemp>())
             return;
+
+
         //See if the player is in range of us
         foreach (Collider col in objects){
 
