@@ -57,11 +57,15 @@ public class WhiteBloodCell : MonoBehaviour {
 
 
 
-        bool pathExists = NavMesh.CalculatePath(groundedPosition, targetGroundedPosition, GetComponent<NavMeshAgent>().areaMask, newPath);
+        bool pathExists;// = NavMesh.CalculatePath(groundedPosition, targetGroundedPosition, GetComponent<NavMeshAgent>().areaMask, newPath);
+
+
+        pathExists = NavMesh.CalculatePath(groundedPosition, targetGroundedPosition, GetComponent<NavMeshAgent>().areaMask, newPath);
 
         if (!pathExists)
         {
             Debug.LogWarning("No path found for: " + gameObject.name + " to " + targetGroundedPosition);
+
         }else 
         {
             //Update member variables to use the new path calculated
@@ -87,7 +91,8 @@ public class WhiteBloodCell : MonoBehaviour {
 
     void UpdatePosition()
     {
-        CheckForNearbyPlayer();
+        if(target == null)
+            CheckForNearbyPlayer();
 
 
         if(target && target.GetComponent<PlayerTemp>())
@@ -100,6 +105,14 @@ public class WhiteBloodCell : MonoBehaviour {
             if (currentPath != null)
             {
                 //Check to see if were close enough to a corner of the path to switch our target to the next corner
+                if(currentPointInPath >= currentPath.corners.Length)
+                {
+
+                    GetRandomTargetPosition();
+                    CalculateNewPath();
+                    return;
+                }
+
                 if ((GetGroundedPosition(transform.position) - currentPath.corners[currentPointInPath]).magnitude < cornerThreshold)
                 {
                     currentPointInPath++;
@@ -142,11 +155,11 @@ public class WhiteBloodCell : MonoBehaviour {
         if (hit.collider != null)
         {
 
-            targetPosition = transform.position + direction * (hit.distance - 10f);
+            targetPosition = transform.position + direction.normalized * (hit.distance - 10f);
         }
         else
         {
-            targetPosition = transform.position + direction * distance;
+            targetPosition = transform.position + direction.normalized * distance;
         }
 
     }

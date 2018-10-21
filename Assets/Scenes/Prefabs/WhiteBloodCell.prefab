@@ -70,8 +70,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1001566528578342}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.410589, y: -1.4239712, z: -2.4904518}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -58.4284, y: 2.1959076, z: -5.6100655}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children:
   - {fileID: 4483966181389158}
   m_Father: {fileID: 0}
@@ -148,7 +148,7 @@ MonoBehaviour:
   target: {fileID: 0}
   speed: 5
   cornerThreshold: 1
-  aggroRange: 100
+  aggroRange: 200
   aggroSpeedBoost: 1.2
 --- !u!114 &114699667620951704
 MonoBehaviour:

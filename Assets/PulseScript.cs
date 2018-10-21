@@ -32,7 +32,7 @@ public class PulseScript : MonoBehaviour {
 
         while (true)
         {
-            Debug.Log("Pulse");
+            //Debug.Log("Pulse");
             Vector3 startScale = transform.localScale;
             float startRange = l.range;
 
@@ -56,7 +56,15 @@ public class PulseScript : MonoBehaviour {
             transform.localScale = startScale;
             l.range = startRange;
 
+
+            for (int i = 0; i < 3; i++)
+            {
+                Vector3 loc = transform.position + new Vector3(Random.Range(-1, 1), Random.Range(-1, 1), Random.Range(-1, 1)) * Random.Range(0, 10);
+                Instantiate(whiteCellPrefab, loc, Quaternion.identity);
+            }
+
             yield return new WaitForSeconds(2);
+
         }
 
     }

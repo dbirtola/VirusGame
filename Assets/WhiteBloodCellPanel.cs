@@ -8,13 +8,20 @@ public class WhiteBloodCellPanel : MonoBehaviour {
     public Text bloodCellCountText;
     PlayerTemp playerTemp;
 
+
     void Awake()
     {
         playerTemp = FindObjectOfType<PlayerTemp>();
     }
 
+
+
     void Start()
     {
+      
         playerTemp.hitByWhiteCellEvent.AddListener((WhiteBloodCell wbc) => { bloodCellCountText.text = playerTemp.currentWhiteBloodCellCount.ToString(); });
+
     }
+
+
 }
