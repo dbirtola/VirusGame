@@ -23,6 +23,10 @@ public class WhiteBloodCell : MonoBehaviour {
     public int aggroRange = 50;
     public float aggroSpeedBoost = 1.5f;
 
+
+
+    public bool dashing = false;
+
     void Start () {
 
         personalFloatFactor = Random.Range(-4, 4f);
@@ -91,10 +95,14 @@ public class WhiteBloodCell : MonoBehaviour {
 
     void UpdatePosition()
     {
+        if (dashing)
+        {
+            return;
+        }
+
         if(target == null)
             CheckForNearbyPlayer();
-
-
+        
         if(target && target.GetComponent<PlayerTemp>())
         {
             var direction = (target.transform.position - transform.position).normalized;
@@ -144,6 +152,35 @@ public class WhiteBloodCell : MonoBehaviour {
     }
 
 
+    void Dash()
+    {
+        dashing = true;
+        StartCoroutine(DashRoutine());
+    }
+
+    IEnumerator DashRoutine()
+    {
+        Vector3 targetPosition = target.transform.position;
+
+        float startTime = Time.time;
+        float vibrate = 15;
+        while (Time.time < startTime + 2f)
+        {
+            transform.position += new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f)) * Time.deltaTime * vibrate;
+            yield return null;
+        }
+
+
+        Vector3 targetDir = (targetPosition - transform.position).normalized;
+
+        //shoot
+
+        GetComponent<Rigidbody>().velocity = targetDir * 200;
+        yield return new WaitForSeconds(1);
+
+        dashing = false;
+    }
+
     void GetRandomTargetPosition() {
         Vector3 direction = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f));
 
@@ -190,6 +227,7 @@ public class WhiteBloodCell : MonoBehaviour {
                     target = hitObject;
                     speed *= aggroSpeedBoost;
                     CalculateNewPath();
+                    Dash();
                 }
             }
 
