@@ -25,6 +25,9 @@ public class PlayerTemp : MonoBehaviour {
     public float shotgunLastFired = 0;
     public float shotgunCooldown = 3;
 
+	public AudioSource shootAudio;
+	public AudioSource hitAudio;
+
     void Awake()
     {
         hitByWhiteCellEvent = new HitByWhiteCellEvent();
@@ -36,6 +39,7 @@ public class PlayerTemp : MonoBehaviour {
         if (Input.GetMouseButtonDown(0))
         {
             Shoot();
+			shootAudio.Play ();
         }
         if (Input.GetMouseButtonDown(1))
         {
@@ -43,6 +47,8 @@ public class PlayerTemp : MonoBehaviour {
             {
 
                 ShotGunBlast();
+				shootAudio.Play ();
+
                 shotgunLastFired = Time.time;
                 shotgunFiredEvent.Invoke();
             }
@@ -55,11 +61,8 @@ public class PlayerTemp : MonoBehaviour {
     {
         currentWhiteBloodCellCount++;
         hitByWhiteCellEvent.Invoke(cell);
+		hitAudio.Play ();
 
-        if(currentWhiteBloodCellCount >= 15)
-        {
-            FindObjectOfType<GameManager>().Restart();
-        }
     }
 
     public void Shoot()
