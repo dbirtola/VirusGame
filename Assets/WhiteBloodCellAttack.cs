@@ -8,13 +8,21 @@ using UnityEngine.Audio;
 
 public class WhiteBloodCellAttack : MonoBehaviour {
 
-	public void OnTriggerEnter(Collider coll)
+
+
+    public GameObject particleSystemPrefab;
+
+
+    public void OnTriggerEnter(Collider coll)
     {
 
         if (coll.gameObject.GetComponent<PlayerTemp>())
         {
             coll.gameObject.GetComponent<PlayerTemp>().OnHitByWhiteCell(transform.parent.GetComponent<WhiteBloodCell>());
 			transform.parent.GetComponent<AudioSource> ().Play ();
+
+
+
             Destroy(transform.parent.gameObject);
         }
     }

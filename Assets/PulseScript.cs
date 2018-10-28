@@ -8,6 +8,12 @@ public class PulseScript : MonoBehaviour {
 
     public GameObject whiteCellPrefab;
 
+    public List<GameObject> spawnedCells;
+
+    void Awake()
+    {
+        spawnedCells = new List<GameObject>();
+    }
 
 	// Use this for initialization
 	void Start () {
@@ -16,7 +22,7 @@ public class PulseScript : MonoBehaviour {
         for(int i = 0; i < 50; i++)
         {
             Vector3 loc = transform.position + new Vector3(Random.Range(-1, 1), Random.Range(-1, 1), Random.Range(-1, 1)) * Random.Range(0, 10);
-            Instantiate(whiteCellPrefab, loc, Quaternion.identity);
+            spawnedCells.Add(Instantiate(whiteCellPrefab, loc, Quaternion.identity));
         }
 	}
 	
@@ -39,7 +45,7 @@ public class PulseScript : MonoBehaviour {
 
             for (int i = 0; i < 30; i++)
             {
-                transform.localScale += Vector3.one * 0.1f;
+                transform.localScale += Vector3.one * 0.15f;
                 l.range += 1f;
                 yield return null;
 
@@ -47,7 +53,7 @@ public class PulseScript : MonoBehaviour {
 
             for (int i = 0; i < 30; i++)
             {
-                transform.localScale -= Vector3.one * 0.1f;
+                transform.localScale -= Vector3.one * 0.15f;
                 l.range -= 1f;
                 yield return null;
 
@@ -60,7 +66,7 @@ public class PulseScript : MonoBehaviour {
             for (int i = 0; i < 3; i++)
             {
                 Vector3 loc = transform.position + new Vector3(Random.Range(-1, 1), Random.Range(-1, 1), Random.Range(-1, 1)) * Random.Range(0, 10);
-                Instantiate(whiteCellPrefab, loc, Quaternion.identity);
+                spawnedCells.Add(Instantiate(whiteCellPrefab, loc, Quaternion.identity));
             }
 
             yield return new WaitForSeconds(2);

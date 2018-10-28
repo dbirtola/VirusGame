@@ -6,26 +6,38 @@ public class OrganHealthPanel : MonoBehaviour {
 
 
     public Slider organSlider;
-    public Organ organ;
+    public Organ[] organs;
+
+    public Organ targetOrgan;
 
     void Awake()
     {
-        organ = FindObjectOfType<Organ>();
+        //organ = FindObjectOfType<Organ>();
+        organs = FindObjectsOfType<Organ>();
     }
     // Use this for initialization
-    void Start () {
-        if (organSlider != null)
-            organ.tookDamageEvent.AddListener(UpdateSlider);
+    void Start()
+    {
+        // if (organSlider != null)
+        //  organ.tookDamageEvent.AddListener(UpdateSlider);
+
+
+        foreach (Organ organ in organs)
+        {
+            organ.tookDamageEvent.AddListener(() =>
+        {
+
+            organSlider.value = (float)organ.health / organ.maxHealth;
+        }
+        );
+        }
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
-
+/*
     void UpdateSlider()
     {
         organSlider.value = (float)organ.health / organ.maxHealth;
     }
+
+    */
 }

@@ -13,9 +13,10 @@ public class Organ : MonoBehaviour
 
     public int health;
     public int maxHealth = 25;
-
+    public bool dead = false;
     public TookDamageEvent tookDamageEvent;
 
+   
     void Awake()
     {
         tookDamageEvent = new TookDamageEvent();
@@ -23,12 +24,41 @@ public class Organ : MonoBehaviour
     }
 
 
+    public void Die()
+    {
+        foreach(GameObject go in GetComponent<PulseScript>().spawnedCells)
+        {
+            if (go)
+            {
 
+                Destroy(go);
+            }
+        }
+        StartCoroutine(shrink());
+        Destroy(GetComponent<PulseScript>());
+        dead = true;
+    }
 
+    IEnumerator shrink()
+    {
+        for(int i = 0; i < 60; i++)
+        {
+            transform.localScale -= Vector3.one * Time.deltaTime * 10;
+            yield return null;
+        }
+    }
     public void TakeDamage()
     {
+        if (dead)
+            return;
+
         health--;
         tookDamageEvent.Invoke();
+
+        if(health <= 0)
+        {
+            Die();
+        }
     }
 
 

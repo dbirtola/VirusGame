@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour {
     public ControlledCamera player;
 	public Organ organ;
 
+    public AudioSource mainMenuMusic;
+    public AudioSource gameMusic;
+
 	void Awake(){
 		gameOverEvent = new GameOverEvent ();
 		player = FindObjectOfType<ControlledCamera> ();
@@ -41,6 +44,9 @@ public class GameManager : MonoBehaviour {
 		player.GetComponent<PlayerTemp> ().hitByWhiteCellEvent.AddListener (CheckLoss);
 		organ.tookDamageEvent.AddListener (CheckWin);
 
+        mainMenuMusic.Stop();
+        gameMusic.Play();
+
     }
 
 	public void CheckLoss(WhiteBloodCell wbc){
@@ -50,8 +56,15 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void CheckWin(){
-		if (organ.health <= 0) {
-			gameOverEvent.Invoke (true);
-		}
-	}
+        foreach(Organ o in FindObjectsOfType<Organ>())
+        {
+
+            if (organ.health > 0)
+            {
+                return;
+            }
+        }
+
+        gameOverEvent.Invoke(true);
+    }
 }

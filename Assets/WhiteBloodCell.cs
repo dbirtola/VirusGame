@@ -24,6 +24,7 @@ public class WhiteBloodCell : MonoBehaviour {
     public float aggroSpeedBoost = 1.5f;
 
 
+    public GameObject particleSystemPrefab;
 
     public bool dashing = false;
 
@@ -34,9 +35,16 @@ public class WhiteBloodCell : MonoBehaviour {
         GetRandomTargetPosition();
         CalculateNewPath();
 
-
+        StartCoroutine(CheckForPlayerRoutine());
       
 	}
+
+    void OnDestroy()
+    {
+        var part = Instantiate(particleSystemPrefab, transform.position, Quaternion.identity);
+
+        Destroy(part, 3);
+    }
 
 
     void CalculateNewPath()
@@ -99,9 +107,6 @@ public class WhiteBloodCell : MonoBehaviour {
         {
             return;
         }
-
-        if(target == null)
-            CheckForNearbyPlayer();
         
         if(target && target.GetComponent<PlayerTemp>())
         {
@@ -152,6 +157,17 @@ public class WhiteBloodCell : MonoBehaviour {
     }
 
 
+    IEnumerator CheckForPlayerRoutine()
+    {
+
+        while (target == null)
+        {
+            CheckForNearbyPlayer();
+
+            yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+        }
+    }
+
     void Dash()
     {
         dashing = true;
@@ -163,7 +179,7 @@ public class WhiteBloodCell : MonoBehaviour {
         Vector3 targetPosition = target.transform.position;
 
         float startTime = Time.time;
-        float vibrate = 15;
+        float vibrate = 30;
         while (Time.time < startTime + 2f)
         {
             transform.position += new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f)) * Time.deltaTime * vibrate;
@@ -200,6 +216,7 @@ public class WhiteBloodCell : MonoBehaviour {
         }
 
     }
+
     void CheckForNearbyPlayer()
     {
         Collider[] objects = Physics.OverlapSphere(transform.position, aggroRange);
@@ -220,15 +237,20 @@ public class WhiteBloodCell : MonoBehaviour {
                 Vector3 direction = col.gameObject.transform.position - transform.position;
                 Physics.Raycast(transform.position, direction, out hit, aggroRange);
 
-                GameObject hitObject = hit.collider.gameObject;
-
-                if (hitObject.GetComponent<PlayerTemp>())
+                if (hit.collider)
                 {
-                    target = hitObject;
-                    speed *= aggroSpeedBoost;
-                    CalculateNewPath();
-                    Dash();
+
+                    GameObject hitObject = hit.collider.gameObject;
+
+                    if (hitObject.GetComponent<PlayerTemp>())
+                    {
+                        target = hitObject;
+                        speed *= aggroSpeedBoost;
+                        CalculateNewPath();
+                        Dash();
+                    }
                 }
+
             }
 
         } //end foreach
